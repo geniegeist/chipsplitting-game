@@ -44,6 +44,13 @@ class CoordinateSystem:
       dfs(self.coordinates[0][0])
 
       return "\n".join([" ".join([str(v) for v in row]) for row in accu[::-1]])
+    
+    def __getitem__(self, key):
+        if type(key) is tuple:
+            return self.coordinates[key[0]][key[1]]
+        if type(key) is int:
+            return self.coordinates[key]
+        raise ValueError("Invalid key type")
 
     def coordinatesOf(self, node):
         for i, cols in enumerate(self.coordinates):
