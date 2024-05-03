@@ -800,6 +800,57 @@ XI_HAT_5_EVEN_SUPP = (
   ]
 )
 
+XI_HAT_5_ODD_SUPP = (
+  [
+    # x
+    False,  False,  False,  False,  
+    False,  False,  False,  False, 
+    False,  False,  False,  False, 
+    False,  False,  False,  False, 
+    # y
+    False, False, False, False, 
+    False, True, True, True, 
+    False, False, False, False, 
+    False, True, True, True, 
+    # z
+    False, False, False, False,
+    True, False, True, False, 
+    False, True, False, True, 
+    False, False, True, False, 
+    # b
+    False, False, False, False,  
+    # c
+    False,  False, False, False, 
+    # d
+    False, False, False, False,
+    True, True, True, False,
+  ],
+  [
+    # x
+    False,  False,  False,  False,  
+    False,  False,  False,  False, 
+    False,  False,  False,  False, 
+    False,  False,  False,  False, 
+    # y
+    False, True, True, True, 
+    False, False, False, False, 
+    False, True, True, True, 
+    False, False, False, False, 
+    # z
+    False, False, False, False,
+    False, True, False, True, 
+    False, False, True, False, 
+    False, False, False, True, 
+    # b
+    False, False, False, False,  
+    # c
+    False,  False, False, False, 
+    # d
+    True, True, True, False,
+    False, False, False, False,
+  ]
+)
+
 XI_HAT_6_EVEN_SUPP = (
   [
     # x
@@ -848,6 +899,57 @@ XI_HAT_6_EVEN_SUPP = (
     # d
     True, True, True, True,
     False, False, False, False
+  ]
+)
+
+XI_HAT_6_ODD_SUPP = (
+  [
+    # x
+    False,  False,  False,  False,  
+    False,  False,  False,  False, 
+    False,  False,  False,  False, 
+    False,  False,  False,  False, 
+    # y
+    True, True, True, True, 
+    False, False, False, False, 
+    True, True, True, True, 
+    False, False, False, False, 
+    # z
+    True, False, True, False,
+    False, True, False, True, 
+    False, False, True, False, 
+    False, False, False, True, 
+    # b
+    False, False, False, False,  
+    # c
+    False,  False, False, False, 
+    # d
+    True, True, True, True,
+    False, False, False, False,
+  ],
+  [
+    # x
+    False,  False,  False,  False,  
+    False,  False,  False,  False, 
+    False,  False,  False,  False, 
+    False,  False,  False,  False, 
+    # y
+    False, False, False, False, 
+    True, True, True, True, 
+    False, False, False, False, 
+    True, True, True, True, 
+    # z
+    False, True, False, True,
+    False, False, True, False, 
+    False, False, False, True, 
+    False, False, False, False, 
+    # b
+    False, False, False, False,  
+    # c
+    False,  False, False, False, 
+    # d
+    False, False, False, False,
+    True, True, True, True
   ]
 )
 
