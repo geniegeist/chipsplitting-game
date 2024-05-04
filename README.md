@@ -4,6 +4,7 @@ A library for computing chip-splitting games as defined in [Classifying one-dime
 
 Work in progress...
 
-## Errata
+## Progress
 
-- Page 25, the second sum of first double sum at the end of the page should end with 3 and not i (i.e. the sum should be from j=0 to 3 and not j=0 to i).
+- Proof for n=4 ✅
+- Proof for n=5 
