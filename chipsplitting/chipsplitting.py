@@ -6,9 +6,10 @@ class Node:
 
     def __repr__(self):
         return f"{''.join([' '] * (4 - len(str(self.value)))) + str(self.value)}"
-         
+
     def __str__(self):
         return f"{''.join([' '] * (4 - len(str(self.value)))) + str(self.value)}"
+
 
 class CoordinateSystem:
     def __init__(self, root):
@@ -27,28 +28,31 @@ class CoordinateSystem:
                 cur = cur.top
             self.coordinates.append(res)
             dfs(n.right)
-        dfs(self.root)
-    
-    def __str__(self):
-      accu = []
-      def dfs(n):
-          if not n:
-              return
-          res = []
-          cur = n
-          while cur:
-              res.append(cur)
-              cur = cur.right
-          accu.append(res)
-          dfs(n.top)
-      dfs(self.coordinates[0][0])
 
-      return "\n".join([" ".join([str(v) for v in row]) for row in accu[::-1]])
-    
+        dfs(self.root)
+
+    def __str__(self):
+        accu = []
+
+        def dfs(n):
+            if not n:
+                return
+            res = []
+            cur = n
+            while cur:
+                res.append(cur)
+                cur = cur.right
+            accu.append(res)
+            dfs(n.top)
+
+        dfs(self.coordinates[0][0])
+
+        return "\n".join([" ".join([str(v) for v in row]) for row in accu[::-1]])
+
     def __getitem__(self, key):
-        if type(key) is tuple:
+        if isinstance(key, tuple):
             return self.coordinates[key[0]][key[1]]
-        if type(key) is int:
+        if isinstance(key, int):
             return self.coordinates[key]
         raise ValueError("Invalid key type")
 
