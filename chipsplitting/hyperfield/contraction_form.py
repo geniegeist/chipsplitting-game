@@ -1,9 +1,20 @@
+"""
+Module containing the contraction form class for hyperfields
+"""
+
 import numpy as np
+from numpy._typing import NDArray
+
 from .linear_form import HyperfieldLinearForm
 
 
 class HyperfieldContractionForm(HyperfieldLinearForm):
-    def __init__(self, support_pos: list[bool], support_neg: list[bool]):
+    """
+    A linear form in a hyperfield is just a sum of x_ij
+    whose coefficients are either 1 or -1.
+    """
+
+    def __init__(self, support_pos: NDArray[np.bool_], support_neg: NDArray[np.bool_]):
         """
         A linear form in a hyperfield is just a sum of x_ij whose coefficients are either 1 or -1.
 
@@ -13,17 +24,26 @@ class HyperfieldContractionForm(HyperfieldLinearForm):
         assert len(support_pos) == 64, "Support must have 64 elements."
         assert len(support_neg) == 64, "Support must have 64 elements."
 
-        self.support_pos = np.array(support_pos)
-        self.support_neg = np.array(support_neg)
+        super().__init__(support_pos, support_neg)
 
     def __getitem__(self, key):
-        return self.values[key]
+        if self.support_pos[key]:
+            return 1
+        if self.support_neg[key]:
+            return -1
+        return 0
 
     def __repr__(self) -> str:
-        return f"HyperfieldContractionForm(positive support: {self.support_pos}, negative support: {self.support_neg})"
+        return (
+            f"HyperfieldContractionForm(positive support: {self.support_pos}, "
+            f"negative support: {self.support_neg})"
+        )
 
     def __str__(self) -> str:
-        return f"HyperfieldContractionForm(positive support: {self.support_pos}, negative support: {self.support_neg})"
+        return (
+            f"HyperfieldContractionForm(positive support: {self.support_pos}, "
+            f"negative support: {self.support_neg})"
+        )
 
     def __call__(self, v):
         for x in v[self.support_pos | self.support_neg]:
@@ -52,7 +72,7 @@ class HyperfieldContractionForm(HyperfieldLinearForm):
             return np.nan
         if has_neg:
             return -1
-        elif has_pos:
+        if has_pos:
             return 1
         return 0
 
@@ -69,34 +89,28 @@ class HyperfieldContractionForm(HyperfieldLinearForm):
             second_char = variable[1]
             third_char = variable[2]
             offset = int(second_char) * 4 + int(third_char)
-            pass
         elif first_char == "y":
             base = 16
             second_char = variable[1]
             third_char = variable[2]
             offset = int(second_char) * 4 + int(third_char)
-            pass
         elif first_char == "z":
             base = 32
             second_char = variable[1]
             third_char = variable[2]
             offset = int(second_char) * 4 + int(third_char)
-            pass
         elif first_char == "b":
             base = 48
             second_char = variable[1]
             offset = int(second_char)
-            pass
         elif first_char == "c":
             base = 52
             second_char = variable[1]
             offset = int(second_char)
-            pass
         elif first_char == "d":
             base = 56
             second_char = variable[1]
             offset = int(second_char) * 4 + int(variable[2])
-            pass
         else:
-            raise Exception(f"Invalid variable {variable}")
+            raise ValueError(f"Invalid variable {variable}")
         return base + offset

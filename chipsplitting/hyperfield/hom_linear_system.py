@@ -1,10 +1,22 @@
-import numpy as np
+"""
+This module contains everything related to solving linear systems 
+of homogeneous linear forms in a hyperfield.
+"""
+
 from collections import deque
-from .linear_form import HyperfieldLinearForm
+
+import numpy as np
+
 from .hyperfield_vector import HyperfieldVector
+from .linear_form import HyperfieldLinearForm
 
 
 class HyperfieldHomogeneousLinearSystem:
+    """
+    A system of homogeneous linear forms in a hyperfield.
+    It contains a list of linear forms that we want to roots for.
+    """
+
     def __init__(self, linear_forms: list[HyperfieldLinearForm]):
         self.linear_forms = linear_forms
 
@@ -27,12 +39,22 @@ class HyperfieldHomogeneousLinearSystem:
         return "\n".join(str(form) for form in self.linear_forms)
 
     def is_solved_by_valid(self, vector: HyperfieldVector) -> bool:
+        """
+        Returns true if the vector is a root of every linear form in the system.
+        Vector must be valid, i.e. its negative support must be empty or may only contain zero.
+        """
         assert vector.is_valid, "Vector must be valid."
         support_without_neg = np.array(vector.values, dtype=bool)
         support_without_neg[0] = False
-        return np.all(self.conditions.dot(support_without_neg))
+        return bool(np.all(self.conditions.dot(support_without_neg)))
 
     def make_constraints(self) -> list[set[int]]:
+        """
+        Given the list of linear forms, compute a list constraints.
+        Each constraint must be satisfied for a configuration to be considered valid.
+        A configuration satisfies a constraint if and only if some component
+        of the configuration is in contained in the constraint.
+        """
         constraints = []
         # contains tuples of positive and negative support for each linear form
         supports = [
@@ -41,11 +63,11 @@ class HyperfieldHomogeneousLinearSystem:
         ]
         for pos, neg in supports:
             if 0 in pos:
-                new_constr = set([i for i in pos if i > 0])
+                new_constr = {i for i in pos if i > 0}
                 if new_constr not in constraints:
                     constraints.append(new_constr)
             elif 0 in neg:
-                new_constr = set([i for i in neg if i > 0])
+                new_constr = {i for i in neg if i > 0}
                 if new_constr not in constraints:
                     constraints.append(new_constr)
             elif len(pos) and len(neg):
@@ -56,7 +78,7 @@ class HyperfieldHomogeneousLinearSystem:
                 if neg_constr not in constraints:
                     constraints.append(neg_constr)
             else:
-                raise Exception("Unsolvable system of linear forms")
+                raise UnsolvableSystemException("Unsolvable system of linear forms")
 
         to_remove = []
         for c in constraints:
@@ -74,6 +96,7 @@ class HyperfieldHomogeneousLinearSystem:
     def quick_solve(self, support_size: int) -> list[list[int]]:
         """
         Solves the system by searching for all possible solutions with a given support size.
+        Use quick_solve_loop for faster results.
         """
 
         def to_tuple(a):
@@ -127,9 +150,12 @@ class HyperfieldHomogeneousLinearSystem:
         return solutions
 
     def quick_solve_loop(self, support_size: int):
+        """
+        The fastest way to find roots of the system.
+        """
         constraints = self.make_constraints()
         constraints.sort(key=len)
-        queue = deque([[]])
+        queue = deque([tuple()])
 
         for constr in constraints:
             for _ in range(len(queue)):
@@ -147,4 +173,10 @@ class HyperfieldHomogeneousLinearSystem:
                     for j in constr:
                         queue.append((*conf, j))
 
-        return list(set([tuple(sorted(list(x))) for x in queue]))
+        return list({tuple(sorted(list(x))) for x in queue})
+
+
+class UnsolvableSystemException(Exception):
+    """
+    The system is not solvable.
+    """

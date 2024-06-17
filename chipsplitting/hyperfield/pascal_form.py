@@ -1,10 +1,19 @@
+"""
+Module containing the Pascal form class for hyperfields
+"""
+
 import numpy as np
+
 from . import utils
-from .linear_form import HyperfieldLinearForm
 from .contraction_form import HyperfieldContractionForm
+from .linear_form import HyperfieldLinearForm
 
 
 class HyperfieldPascalForm(HyperfieldLinearForm):
+    """
+    Class for Pascal forms of hyperfields.
+    """
+
     def __init__(self, degree: int, mode: str, unit: int):
         support_pos = np.full(utils.gauss(degree + 1), False)
         support_neg = np.full(utils.gauss(degree + 1), False)
