@@ -61,3 +61,15 @@ class LinearForm(BaseLinearForm):
                 txt += f"{''.join([' '] * (4 - len(val))) + val} "
             txt += "\n"
         return txt
+
+    def __call__(self, v):
+        pos = 0
+        neg = 0
+
+        for i in range(self.support_pos.size):
+            pos += self.support_pos[i] * v[i]
+
+        for i in range(self.support_neg.size):
+            neg += self.support_neg[i] * v[i]
+
+        return pos - neg
