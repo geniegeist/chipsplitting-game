@@ -7,4 +7,6 @@ Work in progress...
 ## Progress
 
 - Proof for n=4 ✅
-- Proof for n=5 
+- Proof for n=5 ✅
+- Validate results of section 8 ⏳
+- Extend table in section 8 
