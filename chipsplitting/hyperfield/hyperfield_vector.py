@@ -59,3 +59,160 @@ class HyperfieldVector:
 
     def __lor__(self, other):
         return self.values | other
+
+    def contract(self, contraction_size: int):
+        """
+        Converts the hyperfield vector to a hyperfield contraction vector.
+        """
+        assert self.degree >= contraction_size * 3, "Degree must be at least 12"
+
+        num_coordinates = contraction_size**2 * 3 + contraction_size * 4
+        values = np.full(num_coordinates, 0)
+
+        x_coordinates = [
+            utils.get_array_index(i, j)
+            for i in range(contraction_size)
+            for j in range(contraction_size)
+        ]
+
+        y_coordinates = [
+            utils.get_array_index(i, self.degree - i - (contraction_size - 1) + j)
+            for i in range(contraction_size)
+            for j in range(contraction_size)
+        ]
+        z_coordinates = [
+            utils.get_array_index(self.degree - (contraction_size - 1) - j + i, j)
+            for i in range(contraction_size)
+            for j in range(contraction_size)
+        ]
+        b_coordinates = [
+            utils.get_array_index(contraction_size, i) for i in range(contraction_size)
+        ]
+        c_coordinates = [
+            utils.get_array_index(i, contraction_size) for i in range(contraction_size)
+        ]
+        d0_coordinates = [
+            utils.get_array_index(contraction_size, self.degree - contraction_size - i)
+            for i in range(contraction_size)
+        ]
+        d1_coordinates = [
+            utils.get_array_index(
+                contraction_size + 1, self.degree - contraction_size - 1 - i
+            )
+            for i in range(contraction_size)
+        ]
+
+        for c, i in enumerate(x_coordinates):
+            index_to_update = (
+                c // contraction_size
+            ) * contraction_size + c % contraction_size
+            values[index_to_update] = self.values[i]
+
+        for c, i in enumerate(y_coordinates):
+            index_to_update = (
+                (c // contraction_size) * contraction_size
+                + c % contraction_size
+                + contraction_size**2
+            )
+            values[index_to_update] = self.values[i]
+
+        for c, i in enumerate(z_coordinates):
+            index_to_update = (
+                (c // contraction_size) * contraction_size
+                + c % contraction_size
+                + contraction_size**2 * 2
+            )
+            values[index_to_update] = self.values[i]
+
+        for c, i in enumerate(b_coordinates):
+            index_to_update = (
+                (c // contraction_size) * contraction_size
+                + c % contraction_size
+                + contraction_size**2 * 3
+            )
+            indexes = [
+                (i, c)
+                for i in range(contraction_size, self.degree - contraction_size + 1 - c)
+            ]
+            s = [self.values[utils.get_array_index(i, j)] for i, j in indexes]
+
+            if -1 in s and 1 in s:
+                values[index_to_update] = np.nan
+            elif 1 in s:
+                values[index_to_update] = 1
+            elif -1 in s:
+                values[index_to_update] = -1
+            else:
+                values[index_to_update] = 0
+
+        for c, i in enumerate(c_coordinates):
+            index_to_update = (
+                (c // contraction_size) * contraction_size
+                + c % contraction_size
+                + contraction_size**2 * 3
+                + contraction_size
+            )
+            indexes = [
+                (c, i)
+                for i in range(contraction_size, self.degree - contraction_size + 1 - c)
+            ]
+            s = [self.values[utils.get_array_index(i, j)] for i, j in indexes]
+
+            if -1 in s and 1 in s:
+                values[index_to_update] = np.nan
+            elif 1 in s:
+                values[index_to_update] = 1
+            elif -1 in s:
+                values[index_to_update] = -1
+            else:
+                values[index_to_update] = 0
+
+        for c, i in enumerate(d0_coordinates):
+            index_to_update = (
+                (c // contraction_size) * contraction_size
+                + c % contraction_size
+                + contraction_size**2 * 3
+                + contraction_size * 2
+            )
+            indexes = [
+                (col, self.degree - col - c)
+                for col in range(
+                    contraction_size, self.degree - contraction_size + 1 - c, 2
+                )
+            ]
+            s = [self.values[utils.get_array_index(i, j)] for i, j in indexes]
+
+            if -1 in s and 1 in s:
+                values[index_to_update] = np.nan
+            elif 1 in s:
+                values[index_to_update] = 1
+            elif -1 in s:
+                values[index_to_update] = -1
+            else:
+                values[index_to_update] = 0
+
+        for c, i in enumerate(d1_coordinates):
+            index_to_update = (
+                (c // contraction_size) * contraction_size
+                + c % contraction_size
+                + contraction_size**2 * 3
+                + contraction_size * 3
+            )
+            indexes = [
+                (col, self.degree - col - c)
+                for col in range(
+                    contraction_size + 1, self.degree - contraction_size + 1 - c, 2
+                )
+            ]
+            s = [self.values[utils.get_array_index(i, j)] for i, j in indexes]
+
+            if -1 in s and 1 in s:
+                values[index_to_update] = np.nan
+            elif 1 in s:
+                values[index_to_update] = 1
+            elif -1 in s:
+                values[index_to_update] = -1
+            else:
+                values[index_to_update] = 0
+
+        return HyperfieldVector(values)

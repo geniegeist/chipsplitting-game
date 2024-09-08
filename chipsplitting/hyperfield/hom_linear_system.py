@@ -7,8 +7,8 @@ from collections import deque
 
 import numpy as np
 
+from .hyperfield_linear_form import HyperfieldLinearForm
 from .hyperfield_vector import HyperfieldVector
-from .linear_form import HyperfieldLinearForm
 
 
 class HyperfieldHomogeneousLinearSystem:
@@ -54,6 +54,8 @@ class HyperfieldHomogeneousLinearSystem:
         Each constraint must be satisfied for a configuration to be considered valid.
         A configuration satisfies a constraint if and only if some component
         of the configuration is in contained in the constraint.
+
+        :param only_half: If True, only constraints that are contained on the diagonal or in the lower diagonal part of the triangle will be returned.
         """
         constraints = []
         # contains tuples of positive and negative support for each linear form
@@ -61,6 +63,7 @@ class HyperfieldHomogeneousLinearSystem:
             (set(form.support_pos.nonzero()[0]), set(form.support_neg.nonzero()[0]))
             for form in self.linear_forms
         ]
+
         for pos, neg in supports:
             if 0 in pos:
                 new_constr = {i for i in pos if i > 0}
@@ -152,6 +155,9 @@ class HyperfieldHomogeneousLinearSystem:
     def quick_solve_loop(self, support_size: int):
         """
         The fastest way to find roots of the system.
+
+        :param support_size: The size of the support of the roots.
+        :param only_half: If True, only half of symmetric solutions will be returned.
         """
         constraints = self.make_constraints()
         constraints.sort(key=len)

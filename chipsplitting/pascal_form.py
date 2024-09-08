@@ -4,6 +4,7 @@ Module for Pascal forms
 
 import numpy as np
 
+from chipsplitting.hyperfield.hyperfield_linear_form import HyperfieldLinearForm
 from chipsplitting.utils.binomial import ncr
 
 from .linear_form import LinearForm

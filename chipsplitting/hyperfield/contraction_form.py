@@ -5,7 +5,7 @@ Module containing the contraction form class for hyperfields
 import numpy as np
 from numpy._typing import NDArray
 
-from .linear_form import HyperfieldLinearForm
+from .hyperfield_linear_form import HyperfieldLinearForm
 
 
 class HyperfieldContractionForm(HyperfieldLinearForm):
