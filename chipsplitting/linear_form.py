@@ -22,6 +22,8 @@ class LinearForm(BaseLinearForm):
         A linear form is just a sum of x_ij.
 
         """
+        assert np.all(support_pos >= 0)
+        assert np.all(support_neg >= 0)
 
         self._support_pos = np.array(support_pos)
         self._support_neg = np.array(support_neg)
@@ -83,10 +85,16 @@ class LinearForm(BaseLinearForm):
 
         return pos - neg
 
+    def __hash__(self):
+        return hash((tuple(self.support_pos), tuple(self.support_neg)))
+
     def __eq__(self, other):
         return np.all(self.support_pos == other.support_pos) and np.all(
             self.support_neg == other.support_neg
         )
+
+    def __neg__(self):
+        return LinearForm(self.support_neg, self.support_pos)
 
     def __add__(self, other):
         support_pos = np.array([0] * gauss(self.degree + 1))
@@ -143,3 +151,67 @@ class LinearForm(BaseLinearForm):
                 support_neg[index] = True
 
         return HyperfieldLinearForm(support_pos, support_neg)
+
+    def get(self, contraction_size, key):
+        if type(key) is not str:
+            raise NotImplementedError(f"key {key} not implemented")
+
+        letter, index = key.split("_")
+        index = int(index)
+
+        if index >= contraction_size:
+            raise Exception("Invalid index")
+
+        res = []
+
+        if letter in ("d0", "d"):
+            for col in range(
+                contraction_size, self.degree - contraction_size - index + 1, 2
+            ):
+                res.append(
+                    self.support_pos[get_array_index(col, self.degree - col - index)]
+                    - self.support_neg[get_array_index(col, self.degree - col - index)]
+                )
+        elif letter in ("d1", "e"):
+            for col in range(
+                contraction_size + 1, self.degree - contraction_size - index + 1, 2
+            ):
+                res.append(
+                    self.support_pos[get_array_index(col, self.degree - col - index)]
+                    - self.support_neg[get_array_index(col, self.degree - col - index)]
+                )
+        elif letter == "b":
+            for col in range(
+                contraction_size, self.degree - contraction_size - index + 1
+            ):
+                res.append(
+                    self.support_pos[get_array_index(col, index)]
+                    - self.support_neg[get_array_index(col, index)]
+                )
+        elif letter == "c":
+            for row in range(
+                contraction_size, self.degree - contraction_size - index + 1
+            ):
+                res.append(
+                    self.support_pos[get_array_index(index, row)]
+                    - self.support_neg[get_array_index(index, row)]
+                )
+        else:
+            raise NotImplementedError(f"key {key} not implemented")
+
+        return np.array(res)
+
+    def is_contractable(self, contraction_size):
+        assert self.degree >= contraction_size * 3 - 1
+
+        for index in range(contraction_size):
+            for letter in ["b", "c", "d", "e"]:
+                vector = self.get(contraction_size, f"{letter}_{index}")
+                if not (
+                    np.all(np.sign(vector) == [1] * len(vector))
+                    or np.all(np.sign(vector) == [-1] * len(vector))
+                    or np.all(np.sign(vector) == [0] * len(vector))
+                ):
+                    return False
+
+        return True

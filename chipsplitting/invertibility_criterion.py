@@ -60,7 +60,6 @@ def pairing_matrix(
     """
     Compute the pairing matrix.
     """
-    assert len(units) == len(support), "E and S must have same length"
     p_matrix = []  # pairing matrix to return
 
     for a in units:

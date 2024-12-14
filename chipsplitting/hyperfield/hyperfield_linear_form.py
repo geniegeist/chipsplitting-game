@@ -96,6 +96,9 @@ class HyperfieldLinearForm(BaseLinearForm):
 
         return 0
 
+    def __neg__(self):
+        return HyperfieldLinearForm(self.support_neg, self.support_pos)
+
     def __eq__(self, other):
         return np.all(self.support_pos == other.support_pos) and np.all(
             self.support_neg == other.support_neg
